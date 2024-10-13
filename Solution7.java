@@ -35,14 +35,14 @@ import java.util.PriorityQueue;
 public class Solution7 {
 
     public String smallestStringWithSwaps(String s, List<List<Integer>> pairs) {
-
-        if (pairs.size() <= 1) {
+        if (s == null || s.isEmpty() || pairs == null || pairs.isEmpty()) {
             return s;
         }
 
-        // 第 1 步：将任意交换的结点对输入并查集
         int len = s.length();
         UnionFind unionFind = new UnionFind(len);
+        
+        // 第 1 步：将任意交换的结点对输入并查集
         for (List<Integer> pair : pairs) {
             int index1 = pair.get(0);
             int index2 = pair.get(1);
@@ -59,21 +59,18 @@ public class Solution7 {
         }
 
         // 第 3 步：重组字符串
-        StringBuilder stringBuilder = new StringBuilder();
+        char[] result = new char[len];
         for (int i = 0; i < len; i++) {
             int root = unionFind.find(i);
-            stringBuilder.append(hashMap.get(root).poll());
+            result[i] = hashMap.get(root).poll();
         }
-        return stringBuilder.toString();
+        return new String(result);
     }
 
-    private class UnionFind {
+    private static class UnionFind {
 
-        private int[] parent;
-        /**
-         * 以 i 为根结点的子树的高度（引入了路径压缩以后该定义并不准确）
-         */
-        private int[] rank;
+        private final int[] parent;
+        private final int[] rank;
 
         public UnionFind(int n) {
             this.parent = new int[n];
@@ -91,13 +88,13 @@ public class Solution7 {
                 return;
             }
 
-            if (rank[rootX] == rank[rootY]) {
+            if (rank[rootX] < rank[rootY]) {
+                parent[rootX] = rootY;
+            } else if (rank[rootX] > rank[rootY]) {
+                parent[rootY] = rootX;
+            } else {
                 parent[rootX] = rootY;
                 rank[rootY]++;
-            } else if (rank[rootX] < rank[rootY]) {
-                parent[rootX] = rootY;
-            } else {
-                parent[rootY] = rootX;
             }
         }
 
